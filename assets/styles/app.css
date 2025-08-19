@@ -1,3 +1,15 @@
 body {
     background-color: skyblue;
 }
+
+img{
+    width: 40px;
+}
+.header-div{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+main{
+    height: 100vh;
+}
