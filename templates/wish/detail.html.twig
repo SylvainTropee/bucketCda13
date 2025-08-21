@@ -1,6 +1,8 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>Detail d'un souhait id = {{ wishId }}</h1>
+    <h1>Detail du souhait {{ wish.title }}</h1>
+    <div>{{ wish.author }} / {{ wish.dateCreated | date('d-m-Y') }}</div>
+    <p>{{ wish.description | nl2br }}</p>
 {% endblock %}
 
