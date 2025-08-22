@@ -7,6 +7,7 @@ use App\Form\WishType;
 use App\Repository\WishRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -14,7 +15,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/wish', name: 'wish_')]
 final class WishController extends AbstractController
 {
-    #[Route('', name: 'list')]
+    #[Route('/list', name: 'list')]
     public function list(WishRepository $wishRepository): Response
     {
         $wishes = $wishRepository->findBy(["isPublished" => true], ["dateCreated" => "DESC"]);
@@ -46,7 +47,16 @@ final class WishController extends AbstractController
         $wishForm->handleRequest($request);
 
         if ($wishForm->isSubmitted() && $wishForm->isValid()) {
+            //extraire le fichier de type UploadedFile
+            $image = $wishForm->get('wishImage')->getData();
 
+            /**
+             * @var UploadedFile $image
+             */
+            $newFileName = uniqid() . '.' . $image->guessExtension();
+            $image->move($this->getParameter('wish_image_dir'), $newFileName);
+
+            $wish->setWishImage($newFileName);
             $entityManager->persist($wish);
             $entityManager->flush();
 
@@ -98,6 +108,7 @@ final class WishController extends AbstractController
         $wishForm->handleRequest($request);
 
         if ($wishForm->isSubmitted() && $wishForm->isValid()) {
+
 
             $entityManager->persist($wish);
             $entityManager->flush();

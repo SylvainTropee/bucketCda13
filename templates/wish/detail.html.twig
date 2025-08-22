@@ -2,6 +2,7 @@
 
 {% block body %}
     <h1>Detail du souhait {{ wish.title }}</h1>
+    <img style="width: 200px;" src="{{ asset('wish/img/' ~ wish.wishImage) }}" alt="{{ wish.title }}">
     <div>{{ wish.author }} / {{ wish.dateCreated | date('d-m-Y') }}</div>
     <p>{{ wish.description | nl2br }}</p>
 

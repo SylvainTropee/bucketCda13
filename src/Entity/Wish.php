@@ -38,6 +38,9 @@ class Wish
     #[ORM\Column(nullable: true)]
     private ?\DateTime $dateUpdated = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $wishImage = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -124,6 +127,18 @@ class Wish
     #[ORM\PreUpdate]
     public function update(){
         $this->setDateUpdated(new \DateTime());
+    }
+
+    public function getWishImage(): ?string
+    {
+        return $this->wishImage;
+    }
+
+    public function setWishImage(?string $wishImage): static
+    {
+        $this->wishImage = $wishImage;
+
+        return $this;
     }
 
 
