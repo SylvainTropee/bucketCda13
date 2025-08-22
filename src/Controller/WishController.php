@@ -2,8 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\Wish;
+use App\Form\WishType;
 use App\Repository\WishRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -24,7 +28,7 @@ final class WishController extends AbstractController
     {
         $wish = $wishRepository->find($id);
 
-        if(!$wish){
+        if (!$wish) {
             throw $this->createNotFoundException("Oooops ! Wish not found !");
         }
 
@@ -32,4 +36,80 @@ final class WishController extends AbstractController
             "wish" => $wish
         ]);
     }
+
+    #[Route('/add', name: 'add')]
+    public function add(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $wish = new Wish();
+        $wishForm = $this->createForm(WishType::class, $wish);
+
+        $wishForm->handleRequest($request);
+
+        if ($wishForm->isSubmitted() && $wishForm->isValid()) {
+
+            $entityManager->persist($wish);
+            $entityManager->flush();
+
+            $this->addFlash("success", "Idea successfully added !");
+            return $this->redirectToRoute('wish_detail', ['id' => $wish->getId()]);
+        }
+
+        return $this->render("wish/add.html.twig", [
+            "wishForm" => $wishForm
+        ]);
+    }
+
+    #[Route('/delete/{id}', name: 'delete', requirements: ['id' => '\d+'])]
+    public function delete(
+        int                    $id,
+        WishRepository         $wishRepository,
+        EntityManagerInterface $entityManager
+    ): Response
+    {
+        $wish = $wishRepository->find($id);
+
+        if (!$wish) {
+            throw $this->createNotFoundException("Ooops ! Wish not found !");
+        }
+
+        $entityManager->remove($wish);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Idea successfully deleted !');
+        return $this->redirectToRoute('wish_list');
+    }
+
+
+    #[Route('/update/{id}', name: 'update')]
+    public function update(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        WishRepository $wishRepository,
+        int $id
+    ): Response
+    {
+        $wish = $wishRepository->find($id);
+
+        if(!$wish){
+            throw $this->createNotFoundException('Ooops ! Wish not found !');
+        }
+
+        $wishForm = $this->createForm(WishType::class, $wish);
+        $wishForm->handleRequest($request);
+
+        if ($wishForm->isSubmitted() && $wishForm->isValid()) {
+
+            $entityManager->persist($wish);
+            $entityManager->flush();
+
+            $this->addFlash("success", "Idea successfully updated !");
+            return $this->redirectToRoute('wish_detail', ['id' => $wish->getId()]);
+        }
+
+        return $this->render("wish/update.html.twig", [
+            "wishFormUpdate" => $wishForm
+        ]);
+    }
+
+
 }

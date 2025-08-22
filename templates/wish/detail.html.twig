@@ -4,5 +4,13 @@
     <h1>Detail du souhait {{ wish.title }}</h1>
     <div>{{ wish.author }} / {{ wish.dateCreated | date('d-m-Y') }}</div>
     <p>{{ wish.description | nl2br }}</p>
+
+    <a onclick="return confirm('Voulez-vous vraiment supprimer {{ wish.title }} ?')"
+       href="{{ path('wish_delete', {'id': wish.id}) }}">
+        <button>Supprimer</button>
+    </a>
+    <a href="{{ path('wish_update', {'id': wish.id}) }}">
+        <button>Modifier</button>
+    </a>
 {% endblock %}
 

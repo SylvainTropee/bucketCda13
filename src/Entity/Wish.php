@@ -5,7 +5,9 @@ namespace App\Entity;
 use App\Repository\WishRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
+#[ORM\HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: WishRepository::class)]
 class Wish
 {
@@ -14,12 +16,16 @@ class Wish
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\NotBlank(message: "Le titre est obligatoire !")]
+    #[Assert\Length(max: 250, maxMessage: "Titre max {{ limit }} caractères")]
     #[ORM\Column(length: 250)]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
+    #[Assert\NotBlank(message: "L'auteur est obligatoire !")]
+    #[Assert\Length(max: 50, maxMessage: "Auteur max {{ limit }} caractères")]
     #[ORM\Column(length: 50)]
     private ?string $author = null;
 
@@ -108,4 +114,22 @@ class Wish
 
         return $this;
     }
+
+    #[ORM\PrePersist]
+    public function insert(){
+        $this->setDateCreated(new \DateTime());
+        $this->setDateUpdated(new \DateTime());
+    }
+
+    #[ORM\PreUpdate]
+    public function update(){
+        $this->setDateUpdated(new \DateTime());
+    }
+
+
+
+
+
+
+
 }
